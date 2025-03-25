@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { FaTimes } from 'react-icons/fa'; // Removed FaBars since there's no reopen button
 
 function App() {
   const [query, setQuery] = useState('');
@@ -7,6 +8,7 @@ function App() {
   const [currentConversationId, setCurrentConversationId] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Set to false if you want the sidebar hidden by default
 
   const chatContainerRef = useRef(null);
 
@@ -93,6 +95,10 @@ function App() {
     setIsDarkMode((prevMode) => !prevMode);
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
+
   const currentConversation = conversations.find(
     (conv) => conv.id === currentConversationId
   );
@@ -100,14 +106,10 @@ function App() {
 
   return (
     <div className="h-screen bg-[#1a1a1a] dark:bg-[#1a1a1a] flex flex-col transition-colors duration-300 overflow-x-hidden font-sans">
-      {/* Header */}
-      <header className="p-2 bg-[#2a2a2a] dark:bg-[#2a2a2a]">
-        <a href="#" className="text-[#6a5acd] text-sm font-medium">
-          <span className="mr-1">◆</span> Homepage
-        </a>
-      </header>
+      {/* Header (Empty) */}
+      <header className="p-2 bg-[#2a2a2a] dark:bg-[#2a2a2a]"></header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {/* Main Content */}
         <div className="flex-1 flex flex-col items-center justify-between overflow-hidden">
           {/* Chat Area */}
@@ -115,9 +117,12 @@ function App() {
             ref={chatContainerRef}
             className="flex-1 w-full max-w-[90%] overflow-y-auto p-4 flex flex-col items-center"
           >
-            {/* Greeting and Placeholder */}
+            {/* Greeting and User Profile */}
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-12 h-5 bg-[#444] dark:bg-[#444]"></div>
+              {/* User Profile Circle */}
+              <div className="w-12 h-12 bg-[#ff8c00] rounded-full flex items-center justify-center">
+                <span className="text-white text-lg font-bold">S</span>
+              </div>
               <h2 className="text-lg font-medium text-gray-100 dark:text-white">
                 Greetings, Sam
               </h2>
@@ -187,8 +192,26 @@ function App() {
           </form>
         </div>
 
-        {/* Sidebar (Chat History) */}
-        <aside className="w-56 bg-[#202123] dark:bg-[#202123] border-l border-[#4D4D4D] p-3 flex-shrink-0 overflow-y-auto">
+        {/* Sidebar (Chat History) with Hamburger Menu */}
+        <aside
+          className={`${
+            isSidebarOpen ? 'w-56' : 'w-0'
+          } bg-[#202123] dark:bg-[#202123] border-l border-[#4D4D4D] p-3 flex-shrink-0 overflow-y-auto transform transition-all duration-300 ${
+            isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          {/* Hamburger Menu Button (Only visible when sidebar is open) */}
+          {isSidebarOpen && (
+            <div className="flex justify-end mb-2">
+              <button
+                onClick={toggleSidebar}
+                className="p-2 bg-[#343541] dark:bg-[#343541] rounded-full hover:bg-[#4D4D4D] transition text-gray-200"
+              >
+                <FaTimes />
+              </button>
+            </div>
+          )}
+
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium text-gray-200 dark:text-gray-100">
               Chat History
